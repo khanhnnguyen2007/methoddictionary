@@ -1,13 +1,14 @@
 // ===== DATA =====
 const methods = [
-  "x", "z", "ness", "ess", "ally", "ism", "lla", "many", "perb", "hl", "ivy", "vy", "ts",
-  "tsu", "oo", "nga", "aphy", "achi", "aho", "uli", "alop", "bah", "ahu", "ili", "hyal",
-  "sz", "bh", "alin", "asht", "ael", "yle", "avy", "thra", "hais", "sio", "pf", "mh", "ui",
-  "pso", "zh", "weh", "pez", "ez", "az", "sd", "esso", "dh", "arma", "sidh", "dha", "sadh",
-  "kus", "lw", "tcha", "sf", "yc", "ycle", "yp", "tze", "aya", "asca", "fd", "gyms", "oso",
-  "azi", "bk", "hd", "cw", "wp", "cch", "pk", "pd", "gd", "nse", "fb", "sse", "mg", "hana",
-  "acus", "lh", "dii", "nk", "ikh", "ios", "ior", "trak", "elfs", "rg", "abug", "ths",
-  "sso", "ette", "lv", "kte", "obbi", "nja", "yd"
+  "X", "Z", "NESS", "ESS", "ALLY", "ISM", "LLA", "MANY", "PERB", "HL", "IVY",
+  "VY", "TS",
+  "TSU", "OO", "NGA", "APHY", "ACHI", "AHO", "ULI", "ALOP", "BAH", "AHU", "ILI", "HYAL",
+  "SZ", "BH", "ALIN", "ASHT", "AEL", "YLE", "AVY", "THRA", "HAIS", "SIO", "PF", "MH", "UI",
+  "PSO", "ZH", "WEH", "PEZ", "EZ", "AZ", "SD", "ESSO", "DH", "ARMA", "SIDH", "DHA", "SADH",
+  "KUS", "LW", "TCHA", "SF", "YC", "YCLE", "YP", "TZE", "AYA", "ASCA", "FD", "GYMS", "OSO",
+  "AZI", "BK", "HD", "CW", "WP", "CCH", "PK", "PD", "GD", "NSE", "FB", "SSE", "MG", "HANA",
+  "ACUS", "LH", "DII", "NK", "IKH", "IOS", "IOR", "TRAK", "ELFS", "RG", "ABUG", "THS",
+  "SSO", "ETTE", "LV", "KTE", "OBBI", "NJA", "YD"
 ];
 
 let dictionary = [];
@@ -41,15 +42,14 @@ setupEventListeners();
 
 // ===== LOAD DICTIONARY =====
 function loadDictionary() {
-  fetch("https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words.txt")
+  fetch("https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt")
     .then(res => res.text())
     .then(text => {
       dictionary = text
         .split("\n")
-        .map(w => w.trim().toLowerCase())
-        .filter(w => /^[a-z]+$/.test(w));
+        .map(w => w.trim().toLowerCase());
 
-      runFullSearch(); // ← add this
+      runFullSearch();
     });
 }
 
@@ -75,12 +75,10 @@ function createMethodButtons() {
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
 
-  capBtn.textContent = "cap: 10";
+  capBtn.textContent = "Cap: 10";
   capBtn.addEventListener("click", toggleCap);
 
   clearBtn.addEventListener("click", clearEnd);
-
-  quickFireBtn.addEventListener("click", toggleQuickFire);
 
   [startInput, endInput, minLenInput].forEach(input => {
     input.addEventListener("keydown", handleEnter);
@@ -90,7 +88,7 @@ function setupEventListeners() {
 
   document.addEventListener("keydown", handleTab);
 
-  document.addEventListener("keydown", handleShiftAdvance);
+  quickFireBtn.addEventListener("click", toggleQuickFire);
 }
 
 
@@ -99,7 +97,7 @@ function setupEventListeners() {
 // toggle cap
 function toggleCap() {
   capEnabled = !capEnabled;
-  capBtn.textContent = capEnabled ? "cap: 10" : "cap: off";
+  capBtn.textContent = capEnabled ? "Cap: 10" : "Cap: 200";
   renderResults();
 }
 
@@ -111,35 +109,9 @@ function clearEnd() {
 
 // ONLY Enter in start triggers full search
 function handleEnter(e) {
-  if (e.key === "Enter" && e.target === startInput) {
+  if (e.key === "Enter" && (e.target === startInput || e.target === endInput)) {
     runFullSearch(e);
   }
-}
-
-// toggle quick fire + lock input
-function toggleQuickFire() {
-  quickFire = !quickFire;
-
-  quickFireBtn.textContent = quickFire
-    ? "quick fire: on"
-    : "quick fire: off";
-
-  endInput.disabled = quickFire;
-}
-
-// shift to advance quick fire selection
-function handleShiftAdvance(e) {
-  if (!quickFire) return;
-  if (validMethods.length === 0) return;
-
-  quickFireIndex++;
-
-  if (quickFireIndex >= validMethods.length) {
-    quickFireIndex = 0;
-  }
-
-  applyQuickFire();
-  renderResults();
 }
 
 // tab shortcut
@@ -151,6 +123,31 @@ function handleTab(e) {
   }
 }
 
+// toggle quick fire + lock end input
+function toggleQuickFire() {
+  quickFire = !quickFire;
+
+  quickFireBtn.textContent = quickFire
+    ? "quick fire: on"
+    : "quick fire: off";
+
+  endInput.disabled = quickFire;
+
+  if (quickFire) {
+    document.addEventListener("keydown", handleShiftAdvance);
+  } else {
+    document.removeEventListener("keydown", handleShiftAdvance);
+  }
+}
+
+// shift to advance quick fire selection
+function handleShiftAdvance(e) {
+  if (e.key === "Shift" && validMethods.length > 0) {
+    quickFireIndex++;
+    endInput.value = validMethods[quickFireIndex];
+    renderResults();
+  }
+}
 
 // ===== SEARCH =====
 
@@ -163,9 +160,8 @@ function runFullSearch() {
   updateHeatmap();
 
   quickFireIndex = 0;
-  applyQuickFire();
-
   renderResults();
+
 }
 
 // ===== CACHE BUILD =====
@@ -206,22 +202,6 @@ function updateHeatmap() {
     buttons[m].style.backgroundColor = `rgb(${r},${g},0)`;
   });
 }
-
-
-// ===== QUICK FIRE =====
-function applyQuickFire(e) {
-  if (!quickFire) return;
-  if (validMethods.length === 0) return;
-
-  // shift = second method
-  const index = e && e.shiftKey ? 1 : 0;
-  const method = validMethods[index];
-
-  if (!method) return;
-
-  endInput.value = method;
-}
-
 
 // ===== RENDER RESULTS =====
 function renderResults() {

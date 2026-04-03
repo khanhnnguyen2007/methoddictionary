@@ -2,7 +2,7 @@
 body {
   background: #0f0f0f;
   color: #e5e5e5;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-family: -apple-system, Arial, sans-serif;
   padding: 20px;
 }
 
@@ -56,7 +56,12 @@ button:active {
 
 /* special buttons */
 #capBtn {
-  background: #3a3a5a;
+  border: 2px solid #4a6cff; /* blue (off) */
+}
+
+/* active = purple */
+#capBtn.active {
+  border: 2px solid #a259ff;
 }
 
 #clearBtn {
