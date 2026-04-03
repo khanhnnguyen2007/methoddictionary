@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Method Dictionary Search</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h2>Method Dictionary Search</h2>
+
+<div id="controls">
+  <input id="start" placeholder="Starts with (tab)">
+  <input id="endInput" placeholder="Ends with">
+  <button id="clearBtn" type="button">Clear</button>
+  <button id="capBtn" type="button">Cap: 10</button>
+  <select id="sortMode">
+    <option value="short">Short → Long</option>
+    <option value="long">Long → Short</option>
+    <option value="alpha">Alphabetical</option>
+  </select>
+  <input id="minLen" type="number" placeholder="Min length">
+  <button id="quickFireBtn">quick fire: off</button>
+</div>
+
+<div id="buttons"></div>
+
+<ul id="results"></ul>
+
+<script src="script.js"></script>
+</body>
+</html>
